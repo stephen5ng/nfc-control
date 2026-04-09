@@ -1,0 +1,7 @@
+{
+  "restart_game":    "FILL_IN_TAG_ID",
+  "restart_service": "FILL_IN_TAG_ID",
+  "reboot":          "FILL_IN_TAG_ID",
+  "sleep_cubes":     "FILL_IN_TAG_ID",
+  "wake_cubes":      "FILL_IN_TAG_ID"
+}
