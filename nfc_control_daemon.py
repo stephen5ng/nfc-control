@@ -3,7 +3,7 @@
 
 Monitors the MQTT broker for special NFC tags scanned on any cube.
 When a known tag is detected, executes one of the following admin actions:
-  - restart_game    : publish to game/start (soft game restart)
+  - end_game        : publish to game/stop (end game, return to ABC-to-start mode)
   - restart_service : systemctl restart lexacube
   - reboot          : systemctl reboot
   - sleep_cubes     : publish retained "1" to cube/sleep
@@ -49,7 +49,7 @@ NFC_TOPIC = "cube/nfc/+"
 # Minimum seconds between any two action triggers (prevents duplicate scans).
 ACTION_COOLDOWN_S = 3.0
 
-VALID_ACTIONS = {"restart_game", "restart_service", "reboot", "sleep_cubes", "wake_cubes"}
+VALID_ACTIONS = {"end_game", "restart_service", "reboot", "sleep_cubes", "wake_cubes"}
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -118,9 +118,9 @@ def build_tag_to_action(config: dict[str, str]) -> dict[str, str]:
 # Actions
 # ---------------------------------------------------------------------------
 
-async def action_restart_game(client: aiomqtt.Client) -> None:
-    logger.info("Executing: restart_game")
-    await client.publish("game/start", "")
+async def action_end_game(client: aiomqtt.Client) -> None:
+    logger.info("Executing: end_game")
+    await client.publish("game/stop", "")
 
 
 async def action_restart_service() -> None:
@@ -144,8 +144,8 @@ async def action_wake_cubes(client: aiomqtt.Client) -> None:
 
 
 async def dispatch(action: str, client: aiomqtt.Client) -> None:
-    if action == "restart_game":
-        await action_restart_game(client)
+    if action == "end_game":
+        await action_end_game(client)
     elif action == "restart_service":
         await action_restart_service()
     elif action == "reboot":
