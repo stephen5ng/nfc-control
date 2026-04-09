@@ -5,8 +5,8 @@ After=network.target mosquitto.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/lexacube
-ExecStart=/opt/lexacube/cube_env/bin/python3 /opt/lexacube/nfc_control_daemon.py
+WorkingDirectory=/opt/nfc-control
+ExecStart=/opt/lexacube/cube_env/bin/python3 /opt/nfc-control/nfc_control_daemon.py
 Restart=on-failure
 RestartSec=5
 
