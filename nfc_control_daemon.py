@@ -171,6 +171,8 @@ async def run(tag_to_action: dict[str, str]) -> None:
     async with aiomqtt.Client(MQTT_SERVER, MQTT_PORT) as client:
         await client.subscribe(NFC_TOPIC)
         async for message in client.messages:
+            if message.retain:
+                continue
             tag_id = message.payload.decode().strip()
             if not tag_id:
                 continue
