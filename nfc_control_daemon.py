@@ -8,6 +8,7 @@ When a known tag is detected, executes one of the following admin actions:
   - reboot          : systemctl reboot
   - sleep_cubes     : publish retained "1" to cube/sleep
   - wake_cubes      : publish retained "" to cube/sleep
+  - shutdown        : systemctl poweroff
 
 Configuration is read from nfc_control_tags.json (same directory as this file).
 Each action maps to exactly one tag ID string.
@@ -49,7 +50,7 @@ NFC_TOPIC = "cube/nfc/+"
 # Minimum seconds between any two action triggers (prevents duplicate scans).
 ACTION_COOLDOWN_S = 3.0
 
-VALID_ACTIONS = {"end_game", "restart_service", "reboot", "sleep_cubes", "wake_cubes"}
+VALID_ACTIONS = {"end_game", "restart_service", "reboot", "sleep_cubes", "wake_cubes", "shutdown"}
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -145,6 +146,11 @@ async def action_sleep_cubes(client: aiomqtt.Client) -> None:
     await client.publish("cube/sleep", "1", retain=True)
 
 
+async def action_shutdown() -> None:
+    logger.info("Executing: shutdown (systemctl poweroff)")
+    subprocess.Popen(["systemctl", "poweroff"])
+
+
 async def action_wake_cubes(client: aiomqtt.Client) -> None:
     logger.info("Executing: wake_cubes")
     await client.publish("cube/sleep", "", retain=True)
@@ -161,6 +167,8 @@ async def dispatch(action: str, client: aiomqtt.Client) -> None:
         await action_sleep_cubes(client)
     elif action == "wake_cubes":
         await action_wake_cubes(client)
+    elif action == "shutdown":
+        await action_shutdown()
     else:
         logger.error(f"Unknown action in dispatch: {action}")
 
