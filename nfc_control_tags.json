@@ -1,7 +1,7 @@
 {
-  "end_game":        "90F3F7B8500104E0",
-  "restart_service": "4BEBD203530104E0",
-  "reboot":          "D910F8B8500104E0",
-  "sleep_cubes":     "C0F3F7B8500104E0",
-  "wake_cubes":      "33F1F7B8500104E0"
+  "end_game":        ["90F3F7B8500104E0", "09ECD203530104E0"],
+  "restart_service": ["4BEBD203530104E0", "79EBD203530104E0"],
+  "reboot":          ["D910F8B8500104E0", "53EED203530104E0"],
+  "sleep_cubes":     ["C0F3F7B8500104E0", "F6EDD203530104E0"],
+  "wake_cubes":      ["33F1F7B8500104E0", "A9EBD203530104E0"]
 }

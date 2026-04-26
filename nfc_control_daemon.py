@@ -80,8 +80,8 @@ logger = _setup_logging()
 # Config loading
 # ---------------------------------------------------------------------------
 
-def load_tag_config(path: str) -> dict[str, str]:
-    """Load action->tag_id mapping from JSON. Raises on missing file or bad schema."""
+def load_tag_config(path: str) -> dict[str, list[str]]:
+    """Load action->tag_ids mapping from JSON. Raises on missing file or bad schema."""
     with open(path) as f:
         data = json.load(f)
 
@@ -93,24 +93,31 @@ def load_tag_config(path: str) -> dict[str, str]:
     if missing:
         raise ValueError(f"Missing actions in config: {missing}")
 
-    # Verify all tag IDs are non-empty strings
-    for action, tag_id in data.items():
-        if not isinstance(tag_id, str) or not tag_id.strip():
-            raise ValueError(f"Action '{action}' has an empty or invalid tag ID")
+    normalized: dict[str, list[str]] = {}
+    for action, tag_ids in data.items():
+        if isinstance(tag_ids, str):
+            tag_ids = [tag_ids]
+        if not isinstance(tag_ids, list) or not tag_ids:
+            raise ValueError(f"Action '{action}' must have at least one tag ID")
+        for tag_id in tag_ids:
+            if not isinstance(tag_id, str) or not tag_id.strip():
+                raise ValueError(f"Action '{action}' has an empty or invalid tag ID")
+        normalized[action] = tag_ids
 
-    return data
+    return normalized
 
 
-def build_tag_to_action(config: dict[str, str]) -> dict[str, str]:
-    """Invert action->tag_id to tag_id->action. Raises if any tag IDs collide."""
+def build_tag_to_action(config: dict[str, list[str]]) -> dict[str, str]:
+    """Invert action->tag_ids to tag_id->action. Raises if any tag IDs collide."""
     tag_to_action: dict[str, str] = {}
-    for action, tag_id in config.items():
-        if tag_id in tag_to_action:
-            raise ValueError(
-                f"Tag ID '{tag_id}' is assigned to both "
-                f"'{tag_to_action[tag_id]}' and '{action}'"
-            )
-        tag_to_action[tag_id] = action
+    for action, tag_ids in config.items():
+        for tag_id in tag_ids:
+            if tag_id in tag_to_action:
+                raise ValueError(
+                    f"Tag ID '{tag_id}' is assigned to both "
+                    f"'{tag_to_action[tag_id]}' and '{action}'"
+                )
+            tag_to_action[tag_id] = action
     return tag_to_action
 
 
